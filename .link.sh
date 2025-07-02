@@ -6,38 +6,50 @@ YELLOW="\033[1;33m"
 RED="\033[0;31m"
 NC="\033[0m" # No Color
 
-# Set paths
-DOTFILES_HOME="$HOME/dotfiles/home"
+DOTFILES_DIR="$HOME/dotfiles"
+HOME_SOURCE="$DOTFILES_DIR/home"
+CONFIG_SOURCE="$DOTFILES_DIR/config"
+CONFIG_TARGET="$HOME/.config"
 
-# Ensure the dotfiles/home directory exists
-if [ ! -d "$DOTFILES_HOME" ]; then
-  echo -e "${RED}Error: $DOTFILES_HOME does not exist.${NC}"
-  exit 1
-fi
+# Ensure directories exist
+[[ ! -d "$HOME_SOURCE" ]] && echo -e "${RED}Missing: $HOME_SOURCE${NC}" && exit 1
+[[ ! -d "$CONFIG_SOURCE" ]] && echo -e "${RED}Missing: $CONFIG_SOURCE${NC}" && exit 1
+mkdir -p "$CONFIG_TARGET"
 
-# Loop through all files in dotfiles/home
-for SOURCE in "$DOTFILES_HOME"/.*; do
+echo -e "${YELLOW}Linking dotfiles into \$HOME...${NC}"
+
+# Link dotfiles from ~/dotfiles/home to ~/
+for SOURCE in "$HOME_SOURCE"/.*; do
   BASENAME=$(basename "$SOURCE")
-
-  # Skip special entries
   [[ "$BASENAME" == "." || "$BASENAME" == ".." ]] && continue
 
   TARGET="$HOME/$BASENAME"
 
-  # Backup existing non-symlink files
   if [ -e "$TARGET" ] && [ ! -L "$TARGET" ]; then
-    BACKUP="$TARGET.backup"
-    echo -e "${YELLOW}⚠️  Backing up existing $TARGET to $BACKUP${NC}"
-    mv "$TARGET" "$BACKUP"
+    echo -e "${YELLOW}⚠️  Backing up $TARGET to $TARGET.backup${NC}"
+    mv "$TARGET" "$TARGET.backup"
   fi
 
-  # Remove existing symlinks
-  if [ -L "$TARGET" ]; then
-    echo -e "${YELLOW}🔁 Removing existing symlink $TARGET${NC}"
-    rm "$TARGET"
+  [ -L "$TARGET" ] && rm "$TARGET"
+
+  ln -s "$SOURCE" "$TARGET"
+  echo -e "${GREEN}✔ Linked $SOURCE → $TARGET${NC}"
+done
+
+echo -e "${YELLOW}Linking config files into ~/.config...${NC}"
+
+# Link configs from ~/dotfiles/config to ~/.config/
+for SOURCE in "$CONFIG_SOURCE"/*; do
+  BASENAME=$(basename "$SOURCE")
+  TARGET="$CONFIG_TARGET/$BASENAME"
+
+  if [ -e "$TARGET" ] && [ ! -L "$TARGET" ]; then
+    echo -e "${YELLOW}⚠️  Backing up $TARGET to $TARGET.backup${NC}"
+    mv "$TARGET" "$TARGET.backup"
   fi
 
-  # Create the symlink
+  [ -L "$TARGET" ] && rm "$TARGET"
+
   ln -s "$SOURCE" "$TARGET"
   echo -e "${GREEN}✔ Linked $SOURCE → $TARGET${NC}"
 done

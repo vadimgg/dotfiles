@@ -1,0 +1,36 @@
+term = xterm-256color
+theme = catppuccin-mocha
+
+font-style-bold = "Medium"
+font-size = 18
+font-thicken = true
+
+cursor-style = "bar"
+cursor-style-blink = true
+scrollback-limit = 20000
+window-padding-x = 15
+window-padding-y = 15
+window-save-state = "always"
+
+background-opacity = 0.8
+background-blur-radius = 25
+
+keybind = ctrl+shift+n=new_tab
+keybind = ctrl+tab=next_tab
+keybind = ctrl+shift+tab=next_tab
+
+keybind = ctrl+shift+l=new_split:right
+keybind = ctrl+shift+j=new_split:down
+
+keybind = ctrl+h=goto_split:left
+keybind = ctrl+l=goto_split:right
+keybind = ctrl+j=goto_split:bottom
+keybind = ctrl+k=goto_split:top
+
+keybind = ctrl+shift+backspace=close_surface
+
+keybind = ctrl+shift+plus=increase_font_size:1
+keybind = ctrl+shift+minus=decrease_font_size:1
+
+keybind = ctrl+shift+m=toggle_split_zoom
+
