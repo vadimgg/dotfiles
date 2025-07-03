@@ -69,6 +69,7 @@ FORMULAE=(
   bat
   yt-dlp
   lazygit
+only-switch
 )
 
 for pkg in "${FORMULAE[@]}"; do
@@ -82,6 +83,7 @@ CASKS=(
   transmission
   whatsapp
   vlc
+linearmouse
 )
 
 for cask in "${CASKS[@]}"; do
