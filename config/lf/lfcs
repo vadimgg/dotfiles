@@ -1,0 +1,131 @@
+
+set shell zsh
+
+set shellopts '-eu'
+set ifs "\n"
+set scrolloff 10
+set icons
+
+set previewer "~/.config/lf/preview"
+
+
+# Bulk rename on selected files or all the non-hidden files in the current directory if no selection
+cmd bulk-rename ${{
+    index=$(mktemp /tmp/lf-bulk-rename-index.XXXXXXXXXX)
+    if [ -n "${fs}" ]; then
+        echo "$fs" > $index
+    else
+        echo "$(ls "$(dirname $f)" | tr ' ' "\n")" > $index
+    fi
+    index_edit=$(mktemp /tmp/lf-bulk-rename.XXXXXXXXXX)
+    cat $index > $index_edit
+    $EDITOR $index_edit
+    if [ $(cat $index | wc -l) -eq $(cat $index_edit | wc -l) ]; then
+        max=$(($(cat $index | wc -l)+1))
+        counter=1
+        while [ $counter -le $max ]; do
+            a="$(cat $index | sed "${counter}q;d")"
+            b="$(cat $index_edit | sed "${counter}q;d")"
+            counter=$(($counter+1))
+
+            [ "$a" = "$b" ] && continue
+            [ -e "$b" ] && echo "File exists: $b" && continue
+            mv "$a" "$b"
+        done
+    else
+        echo "Number of lines must stay the same"
+    fi
+    rm $index $index_edit
+}}
+
+# Bulk duplicate on selected files or all the non-hidden files in the current directory if no selection
+cmd bulk-duplicate ${{
+    index=$(mktemp /tmp/lf-bulk-duplicate-index.XXXXXXXXXX)
+    if [ -n "${fs}" ]; then
+        echo "$fs" > $index
+    else
+        echo "$(ls "$(dirname $f)" | tr ' ' "\n")" > $index
+    fi
+    index_edit=$(mktemp /tmp/lf-bulk-duplicate.XXXXXXXXXX)
+    cat $index > $index_edit
+    $EDITOR $index_edit
+    if [ $(cat $index | wc -l) -eq $(cat $index_edit | wc -l) ]; then
+        max=$(($(cat $index | wc -l)+1))
+        counter=1
+        while [ $counter -le $max ]; do
+            a="$(cat $index | sed "${counter}q;d")"
+            b="$(cat $index_edit | sed "${counter}q;d")"
+            counter=$(($counter+1))
+
+            [ "$a" = "$b" ] && continue
+            [ -e "$b" ] && echo "File exists: $b" && continue
+            cp "$a" "$b"
+        done
+    else
+        echo "Number of lines must stay the same"
+    fi
+    rm $index $index_edit
+}}
+
+# Select the file or directory via fzf
+cmd fzf-select ${{
+  IFS=' '
+  exclude=$(cat $HOME/exclude | sed 's/^/--exclude /' | tr '\n' ' ')
+  select=$(fd --hidden --follow $exclude | fzf) || true
+  lf -remote "send $id select $select"
+}}
+
+# Copy the file names (including extension) of the selections separated by \n
+cmd copy-filename ${{
+  names="$(echo $fx | tr ' ' '\n' | xargs -I{} basename {})"
+  echo $names | tr ' ' '\n' | pbcopy
+}}
+
+# Copy the absolute paths of selections separated by \n
+cmd copy-absolute-path ${{
+  echo $fx | tr ' ' '\n' | pbcopy
+}}
+
+
+
+# Create a directory with the selected items
+cmd new-folder-with-selection ${{
+  set -f
+  printf "Directory name: "
+  read newd
+  mkdir -- "$newd"
+  mv -- $fx "$newd"
+}}
+
+map <space>
+map d
+map y
+
+cmd mkdir $mkdir -p "$(echo $* | tr ' ' '\ ')"
+cmd mkfile touch "$(echo $* | tr ' ' '\ ')"
+
+# create new file (ctrl + a)
+map <c-a> push $touch<space>
+
+<LeftMouse>map <space># give a name and then make a directory
+map <c-n> push :mkdir<space>
+map <a-n> new-folder-with-selection# give a name and then make a directory
+
+# map V $nvim .
+
+map yy copy
+map yn copy-filename
+map yP copy-absolute-path
+
+map dd cut
+
+map x delete
+
+map R bulk-rename
+map C bulk-duplicate
+
+map A rename # at the very end (A)
+map a push A<c-a> # at the very beginning (I)
+
+map <tab> :toggle;down
+map <c-f> fzf-select
