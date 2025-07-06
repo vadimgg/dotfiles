@@ -70,9 +70,11 @@ FORMULAE=(
   yt-dlp
   lazygit
   lf
+  fzf
   starship
   only-switch
   yazi
+  qmk/qmk/qmk
 )
 
 for pkg in "${FORMULAE[@]}"; do
