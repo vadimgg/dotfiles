@@ -33,3 +33,32 @@ function c() {
 	fi
 	rm -f -- "$tmp"
 }
+
+pdfhx() {
+  if [[ -z "$1" ]]; then
+    echo "Usage: pdfhx <file.pdf>"
+    return 1
+  fi
+
+  local file="$1"
+  if [[ ! -f "$file" ]]; then
+    echo "Error: File '$file' not found"
+    return 1
+  fi
+
+  local tmpfile
+  tmpfile=$(mktemp /tmp/pdfhx_XXXXXX) || {
+    echo "Error: Failed to create temp file"
+    return 1
+  }
+
+  local txtfile="${tmpfile}.txt"
+
+  pdftotext -layout "$file" "$txtfile" || {
+    echo "Error: pdftotext failed"
+    return 1
+  }
+
+  hx "$txtfile"
+  rm -f "$txtfile"
+}

@@ -75,6 +75,11 @@ FORMULAE=(
   only-switch
   yazi
   qmk/qmk/qmk
+  rga
+  pandoc
+  poppler
+  ffmpeg
+  poppler
 )
 
 for pkg in "${FORMULAE[@]}"; do
