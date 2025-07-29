@@ -34,3 +34,4 @@ keybind = ctrl+shift+minus=decrease_font_size:1
 
 keybind = ctrl+shift+m=toggle_split_zoom
 
+keybind = ctrl+shift+t=toggle_quick_terminal

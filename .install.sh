@@ -80,6 +80,7 @@ FORMULAE=(
   poppler
   ffmpeg
   poppler
+  go
 )
 
 for pkg in "${FORMULAE[@]}"; do

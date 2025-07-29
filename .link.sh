@@ -53,3 +53,35 @@ for SOURCE in "$CONFIG_SOURCE"/*; do
   ln -s "$SOURCE" "$TARGET"
   echo -e "${GREEN}✔ Linked $SOURCE → $TARGET${NC}"
 done
+
+
+
+echo -e "${YELLOW}Linking scripts from dotfiles/bin into ~/.local/bin...${NC}"
+
+BIN_SOURCE="$DOTFILES_DIR/bin"
+BIN_TARGET="$HOME/.local/bin"
+
+mkdir -p "$BIN_TARGET"
+
+for SCRIPT in "$BIN_SOURCE"/*; do
+  BASENAME=$(basename "$SCRIPT")
+  TARGET="$BIN_TARGET/$BASENAME"
+
+  if [ -e "$TARGET" ] && [ ! -L "$TARGET" ]; then
+    echo -e "${YELLOW}⚠️  Backing up $TARGET to $TARGET.backup${NC}"
+    mv "$TARGET" "$TARGET.backup"
+  fi
+
+  [ -L "$TARGET" ] && rm "$TARGET"
+
+  ln -s "$SCRIPT" "$TARGET"
+  chmod +x "$SCRIPT" # Ensure the original script is executable
+  echo -e "${GREEN}✔ Linked $SCRIPT → $TARGET${NC}"
+done
+
+# Check if ~/.local/bin is in PATH
+if [[ ":$PATH:" != *":$BIN_TARGET:"* ]]; then
+  echo -e "${RED}⚠️  ~/.local/bin is not in your PATH.${NC}"
+  echo -e "${YELLOW}👉 Add this line to your shell config (~/.zshrc or ~/.bashrc):${NC}"
+  echo -e "   ${GREEN}export PATH=\"\$HOME/.local/bin:\$PATH\"${NC}"
+fi
