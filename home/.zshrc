@@ -78,52 +78,49 @@ pdf_search() {
         return 1
     fi
     
-    if [[ -z "$query" ]]; then
-        echo "Usage: pdf_search_content [directory] <search_query>"
+    if ! command -v pdftotext >/dev/null 2>&1; then
+        echo "Error: pdftotext is required for preview. Install with: brew install poppler"
         return 1
     fi
     
-    # Create preview function that shows context around the match
-    local preview_cmd='
-    file={1}
-    page={2}
-    match_text={3}
-    echo "=== PDF: $(basename "$file") ==="
-    echo "=== Page: $page ==="
-    echo "=== Match: $match_text ==="
-    echo ""
-    
-    # Extract text and show context around the matching page
-    if command -v pdftotext >/dev/null 2>&1; then
-        full_text=$(pdftotext "$file" - 2>/dev/null)
-        if [[ -n "$full_text" ]]; then
-            # Show context around the match
-            echo "$full_text" | grep -i -A 3 -B 3 --color=always "'"$query"'" | head -20
-        else
-            echo "Could not extract text from PDF"
-        fi
-    else
-        echo "pdftotext not available for content preview"
-        echo "Install with: brew install poppler"
+    if [[ -z "$query" ]]; then
+        echo "Usage: pdf_search [directory] <search_query>"
+        return 1
     fi
-    '
-    
-    # Search PDF content and show results with fzf
-    pdfgrep -r -n -H "$query" "$search_dir" --include="*.pdf" 2>/dev/null | \
-    sed 's/:/\t/g' | \
+
+    pdfgrep -r -n -H --include="*.pdf" "$query" "$search_dir" 2>/dev/null | \
+    awk -F':' '{printf "%s\t%s\t%s\n", $1, $2, $3}' | \
     fzf --height=80% \
         --layout=reverse \
         --border \
         --delimiter='\t' \
         --with-nth=1,2,3 \
-        --preview="$preview_cmd" \
+        --preview='
+          file=$(echo {1})
+          page=$(echo {2})
+          line=$(echo {3})
+          
+          tmpfile=$(mktemp)
+          pdftotext -f $page -l $page "$file" "$tmpfile" 2>/dev/null
+          
+          if [[ -s "$tmpfile" ]]; then
+            echo "== PDF: $(basename "$file") =="
+            echo "== Page: $page =="
+            echo ""
+            cat "$tmpfile" | grep -i -C 3 --color=always "$(printf %q "$line")" | head -20
+          else
+            echo "No text extracted from page $page"
+          fi
+
+          rm -f "$tmpfile"
+        ' \
         --preview-window=right:60%:wrap \
         --bind="enter:execute(open {1})" \
         --bind="ctrl-o:execute(open -a Preview {1})" \
-        --bind="ctrl-p:execute(open -a Preview {1} && sleep 0.5)" \
-        --header="Enter: open file | Ctrl-O: open with Preview | Ctrl-P: open and focus Preview" \
-        --prompt="Content Search ($query): "
+        --header="Enter: open file | Ctrl-O: open with Preview.app" \
+        --prompt="PDF Search ($query): "
 }
+
 
 
 # Quick PDF info function
