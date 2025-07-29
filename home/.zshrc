@@ -65,63 +65,66 @@ pdf_hx() {
 
 
 pdf_search() {
-    local search_dir="${1:-.}"
-    local query="$2"
-    
-    if ! command -v fzf >/dev/null 2>&1; then
-        echo "Error: fzf is required but not installed. Install with: brew install fzf"
-        return 1
-    fi
-    
-    if ! command -v pdfgrep >/dev/null 2>&1; then
-        echo "Error: pdfgrep is required for content search. Install with: brew install pdfgrep"
-        return 1
-    fi
-    
-    if ! command -v pdftotext >/dev/null 2>&1; then
-        echo "Error: pdftotext is required for preview. Install with: brew install poppler"
-        return 1
-    fi
-    
-    if [[ -z "$query" ]]; then
-        echo "Usage: pdf_search [directory] <search_query>"
-        return 1
-    fi
+  local search_dir="${1:-.}"
+  local query="$2"
 
-    pdfgrep -r -n -H --include="*.pdf" "$query" "$search_dir" 2>/dev/null | \
-    awk -F':' '{printf "%s\t%s\t%s\n", $1, $2, $3}' | \
-    fzf --height=80% \
-        --layout=reverse \
-        --border \
-        --delimiter='\t' \
-        --with-nth=1,2,3 \
-        --preview='
-          file=$(echo {1})
-          page=$(echo {2})
-          line=$(echo {3})
-          
-          tmpfile=$(mktemp)
-          pdftotext -f $page -l $page "$file" "$tmpfile" 2>/dev/null
-          
-          if [[ -s "$tmpfile" ]]; then
-            echo "== PDF: $(basename "$file") =="
-            echo "== Page: $page =="
-            echo ""
-            cat "$tmpfile" | grep -i -C 3 --color=always "$(printf %q "$line")" | head -20
-          else
-            echo "No text extracted from page $page"
-          fi
+  if ! command -v fzf >/dev/null 2>&1; then
+    echo "Error: fzf is required but not installed. Install with: brew install fzf"
+    return 1
+  fi
 
-          rm -f "$tmpfile"
-        ' \
-        --preview-window=right:60%:wrap \
-        --bind="enter:execute(open {1})" \
-        --bind="ctrl-o:execute(open -a Preview {1})" \
-        --header="Enter: open file | Ctrl-O: open with Preview.app" \
-        --prompt="PDF Search ($query): "
+  if ! command -v pdfgrep >/dev/null 2>&1; then
+    echo "Error: pdfgrep is required. Install with: brew install pdfgrep"
+    return 1
+  fi
+
+  if ! command -v pdftotext >/dev/null 2>&1; then
+    echo "Error: pdftotext (from poppler) is required. Install with: brew install poppler"
+    return 1
+  fi
+
+  if [[ -z "$query" ]]; then
+    echo "Usage: pdf_search [directory] <search_query>"
+    return 1
+  fi
+
+  # Escape query for safe highlighting
+  local esc_query
+  esc_query=$(printf '%s\n' "$query" | sed 's/[]\/$*.^[]/\\&/g')
+
+  pdfgrep -r -n -H --include="*.pdf" "$query" "$search_dir" 2>/dev/null | \
+  awk -F':' '{printf "%s\t%s\t%s\n", $1, $2, $3}' | \
+  fzf --height=80% \
+      --layout=reverse \
+      --border \
+      --delimiter='\t' \
+      --with-nth=1,2,3 \
+      --preview '
+        file=$(echo {1})
+        page=$(echo {2})
+        line=$(echo {3})
+
+        tmpfile=$(mktemp)
+        pdftotext -f "$page" -l "$page" "$file" "$tmpfile" 2>/dev/null
+
+        if [[ -s "$tmpfile" ]]; then
+          echo "== PDF: $(basename "$file") =="
+          echo "== Page: $page =="
+          echo ""
+          grep -i -C 3 --color=never -- "$line" "$tmpfile" | \
+            sed "s/'"$esc_query"'/$(printf '"'"'\033[1;31m'"'"')&$(printf '"'"'\033[0m'"'"')/Ig"
+        else
+          echo "No text extracted from page $page"
+        fi
+
+        rm -f "$tmpfile"
+      ' \
+      --preview-window=right:60%:wrap \
+      --bind="enter:execute(open {1})" \
+      --bind="ctrl-o:execute(open -a Preview {1})" \
+      --header="Enter: open file | Ctrl-O: open with Preview.app" \
+      --prompt="PDF Search ($query): "
 }
-
-
 
 # Quick PDF info function
 pdf_info() {
