@@ -81,6 +81,9 @@ FORMULAE=(
   ffmpeg
   poppler
   go
+  unzip
+  pandoc
+  fd
 )
 
 for pkg in "${FORMULAE[@]}"; do

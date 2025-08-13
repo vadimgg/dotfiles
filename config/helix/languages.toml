@@ -19,7 +19,8 @@ command = "clippy"
 
 [language-server.emmet-ls]
 args = ["--stdio"]
-command="emmet-ls"
+# command="emmet-ls"
+command="emmet-language-server"
 
 [language-server.astro-ls]
 command = "astro-ls"
