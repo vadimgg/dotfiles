@@ -1,6 +1,8 @@
 
 # Language support configuration.
-
+[language-server.tailwindcss-ls]
+command = "tailwindcss-language-server"
+args = ["--stdio"]
 
 [[language]]
 name = "javascript"

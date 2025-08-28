@@ -25,6 +25,7 @@ C = ["kill_to_line_end", "insert_mode"]
 V = ["copy_selection_on_next_line"]
 A-m = "select_next_sibling"
 A-n = "select_prev_sibling"
+"C-," = "remove_primary_selection"
 
 [keys.select]
 L = ["goto_line_end"]
@@ -67,6 +68,18 @@ X = ":buffer-close-others"
 C-q = ":quit-all"
 C-s = ":write!"
 x = ":buffer-close"
+e = [
+  ':sh rm -f /tmp/files2open',
+  ':set mouse false',
+  ':insert-output yazi "%{buffer_name}" --chooser-file=/tmp/files2open',
+  ':redraw',
+  ':set mouse true',
+  ':open /tmp/files2open',
+  'select_all',
+  'split_selection_on_newline',
+  'goto_file',
+  ':buffer-close! /tmp/files2open',
+]
 
 # g = ":pipe-to wezterm cli split-pane -- helix-live-grep"
 # l = ":pipe-to helix-debug-print"
@@ -80,27 +93,27 @@ x = ":buffer-close"
 # B = ":pipe-to wezterm cli split-pane -- hx-git-blame"
 
 # space = [":new", ":insert-output lf-pick-current %{filename}", "select_all", "split_selection_on_newline", "goto_file", "goto_last_modified_file", ":buffer-close!", ":redraw"]
-space = ":sh hx-zellij-actions.sh explorer %{cwd} %{filename} %{linenumber}"
+# space = ":sh hx-zellij-actions.sh explorer %{cwd} %{filename} %{linenumber}"
 
-[keys.normal.";"]
-b = ":sh git blame -c --date=short -L %{linenumber},+1 %{filename}"
-B = ":sh hx-wezterm.sh blame %{cwd} %{filename} %{linenumber}"
-e = ":sh hx-wezterm.sh explorer %{cwd} %{filename} %{linenumber}"
+# [keys.normal.";"]
+# b = ":sh git blame -c --date=short -L %{linenumber},+1 %{filename}"
+# B = ":sh hx-wezterm.sh blame %{cwd} %{filename} %{linenumber}"
+# e = ":sh hx-wezterm.sh explorer %{cwd} %{filename} %{linenumber}"
 
-f = ":sh hx-wezterm.sh file-search-cwd %{cwd} %{filename} %{linenumber}"
-F = ":sh hx-wezterm.sh file-search %{cwd} %{filename} %{linenumber}"
+# f = ":sh hx-wezterm.sh file-search-cwd %{cwd} %{filename} %{linenumber}"
+# F = ":sh hx-wezterm.sh file-search %{cwd} %{filename} %{linenumber}"
 
-g = ":sh hx-wezterm.sh file-grep-cwd %{cwd} %{filename} %{linenumber}"
-G = ":sh hx-wezterm.sh file-grep %{cwd} %{filename} %{linenumber}"
+# g = ":sh hx-wezterm.sh file-grep-cwd %{cwd} %{filename} %{linenumber}"
+# G = ":sh hx-wezterm.sh file-grep %{cwd} %{filename} %{linenumber}"
 
-r = ":sh hx-wezterm.sh file-renamer-cwd %{cwd} %{filename} %{linenumber}"
-R = ":sh hx-wezterm.sh file-renamer %{cwd} %{filename} %{linenumber}"
+# r = ":sh hx-wezterm.sh file-renamer-cwd %{cwd} %{filename} %{linenumber}"
+# R = ":sh hx-wezterm.sh file-renamer %{cwd} %{filename} %{linenumber}"
 
-t = ":sh hx-wezterm.sh file-renamer-grep-cwd %{cwd} %{filename} %{linenumber}"
-T = ":sh hx-wezterm.sh file-renamer-grep %{cwd} %{filename} %{linenumber}"
+# t = ":sh hx-wezterm.sh file-renamer-grep-cwd %{cwd} %{filename} %{linenumber}"
+# T = ":sh hx-wezterm.sh file-renamer-grep %{cwd} %{filename} %{linenumber}"
 
-s = ":sh hx-wezterm.sh file-replace-cwd %{cwd} %{filename} %{linenumber}"
-S = ":sh hx-wezterm.sh file-replace %{cwd} %{filename} %{linenumber}"
+# s = ":sh hx-wezterm.sh file-replace-cwd %{cwd} %{filename} %{linenumber}"
+# S = ":sh hx-wezterm.sh file-replace %{cwd} %{filename} %{linenumber}"
 
-# "`" = ":sh hx-wezterm.sh lazygit %{cwd} %{filename} %{linenumber}"
-"`" = ":sh hx-zellij-actions.sh lazygit %{cwd} %{filename} %{linenumber}"
+# # "`" = ":sh hx-wezterm.sh lazygit %{cwd} %{filename} %{linenumber}"
+# "`" = ":sh hx-zellij-actions.sh lazygit %{cwd} %{filename} %{linenumber}"
