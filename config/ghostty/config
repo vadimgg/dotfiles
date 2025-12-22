@@ -1,5 +1,5 @@
 term = xterm-256color
-theme = catppuccin-mocha
+theme = Catppuccin Mocha
 
 font-style-bold = "Medium"
 font-size = 18
@@ -32,6 +32,6 @@ keybind = ctrl+shift+backspace=close_surface
 keybind = ctrl+shift+plus=increase_font_size:1
 keybind = ctrl+shift+minus=decrease_font_size:1
 
-keybind = ctrl+shift+m=toggle_split_zoom
+keybind = ctrl+shift+f=toggle_split_zoom
 
 keybind = ctrl+shift+t=toggle_quick_terminal
