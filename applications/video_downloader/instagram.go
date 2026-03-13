@@ -5,15 +5,16 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"time"
 )
 
-func downloadInstagram(url, configPath, outputDirOverride, formatOverride string) {
+// downloadInstagram downloads an Instagram video and returns the file path and output dir.
+func downloadInstagram(url, configPath, outputDirOverride, formatOverride string) (filePath, outputDir string) {
 	cfg, err := loadConfig(configPath)
 	printConfigStatus(configPath, err)
 
 	ig := cfg.Instagram
 
-	// CLI overrides
 	if outputDirOverride != "" {
 		ig.OutputDir = outputDirOverride
 	}
@@ -21,7 +22,6 @@ func downloadInstagram(url, configPath, outputDirOverride, formatOverride string
 		ig.Format = formatOverride
 	}
 
-	// Env-var credentials override config file
 	if v := os.Getenv("IG_USERNAME"); v != "" {
 		ig.Auth.Username = v
 	}
@@ -29,21 +29,51 @@ func downloadInstagram(url, configPath, outputDirOverride, formatOverride string
 		ig.Auth.Password = v
 	}
 
-	// Ensure yt-dlp is available
 	ytDlp := cfg.Advanced.YtDlpPath
 	if _, err := exec.LookPath(ytDlp); err != nil {
-		fmt.Printf("❌ yt-dlp not found at %q. Install it with:\n", ytDlp)
-		fmt.Println("   pip install yt-dlp   or   brew install yt-dlp")
+		printError("yt-dlp not found at %q. Install it with:", ytDlp)
+		printTip("pip install yt-dlp   or   brew install yt-dlp")
 		os.Exit(1)
 	}
 
-	absOutputDir, err := prepareOutputDir(ig.OutputDir)
+	// ── Fetch metadata ───────────────────────────────────────────────────────
+	fmt.Printf("%s %s\n", cBold("🔍 Fetching metadata:"), cURL(url))
+
+	metaExtraArgs := authArgs(cfg.Advanced)
+	if ig.Auth.Username != "" && ig.Auth.Password != "" {
+		metaExtraArgs = append(metaExtraArgs, "--username", ig.Auth.Username, "--password", ig.Auth.Password)
+	}
+
+	meta, err := fetchMeta(ytDlp, url, metaExtraArgs)
 	if err != nil {
-		fmt.Printf("❌ Could not prepare output directory: %v\n", err)
+		printWarn("Could not fetch metadata (%v) — using fallback folder name.", err)
+		meta = videoMeta{Title: "untitled", UploadDate: time.Now().Format("20060102")}
+	} else {
+		account := meta.Channel
+		if account == "" {
+			account = meta.Uploader
+		}
+		fmt.Printf("  %s %s\n",   cDim("Account:"), cBold(account))
+		fmt.Printf("  %s %s\n\n", cDim("Title:  "), cBold(meta.Title))
+	}
+
+	folderName := buildFolderName(meta)
+
+	// ── Prepare directories ──────────────────────────────────────────────────
+	baseDir, err := prepareOutputDir(ig.OutputDir)
+	if err != nil {
+		printError("Could not prepare output directory: %v", err)
 		os.Exit(1)
 	}
 
-	outputTemplate := filepath.Join(absOutputDir, ig.FileNamePrefix+"_%(id)s.%(ext)s")
+	videoDir := filepath.Join(baseDir, folderName)
+	if err := os.MkdirAll(videoDir, 0755); err != nil {
+		printError("Could not create video folder: %v", err)
+		os.Exit(1)
+	}
+	outputDir = videoDir
+
+	outputTemplate := filepath.Join(videoDir, "%(id)s.%(ext)s")
 
 	args := []string{
 		"--format", ig.Format,
@@ -53,6 +83,9 @@ func downloadInstagram(url, configPath, outputDirOverride, formatOverride string
 		"--progress",
 	}
 
+	if cfg.Advanced.CookiesFromBrowser != "" {
+		args = append(args, "--cookies-from-browser", cfg.Advanced.CookiesFromBrowser)
+	}
 	if cfg.Advanced.SkipIfExists {
 		args = append(args, "--no-overwrites")
 	}
@@ -69,27 +102,29 @@ func downloadInstagram(url, configPath, outputDirOverride, formatOverride string
 		args = append(args, "--sleep-interval", fmt.Sprintf("%d", cfg.Advanced.SleepInterval))
 	}
 	if ig.Auth.Username != "" && ig.Auth.Password != "" {
-		fmt.Println("🔐 Using Instagram credentials.")
+		printInfo("Using Instagram credentials.")
 		args = append(args, "--username", ig.Auth.Username, "--password", ig.Auth.Password)
 	}
 
 	args = append(args, url)
 
-	fmt.Printf("⬇️  Downloading: %s\n", url)
-	fmt.Printf("📁 Saving to:   %s\n\n", absOutputDir)
+	fmt.Printf("%s %s\n",   cBold("⬇️  Downloading:"), cURL(url))
+	fmt.Printf("%s %s\n\n", cBold("📁 Saving to:  "), cPath(videoDir))
 
 	cmd := exec.Command(ytDlp, args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
 	if err := cmd.Run(); err != nil {
-		fmt.Printf("\n❌ Download failed: %v\n", err)
-		fmt.Println("\nTips:")
-		fmt.Println("  • Private posts require credentials in config.yml or IG_USERNAME/IG_PASSWORD env vars.")
-		fmt.Println("  • Stories expire after 24 hours.")
-		fmt.Println("  • Keep yt-dlp updated: pip install -U yt-dlp")
+		printError("Download failed: %v", err)
+		fmt.Println(cBold("\nTips:"))
+		printTip("Private posts require credentials in config.yml or IG_USERNAME/IG_PASSWORD env vars.")
+		printTip("Stories expire after 24 hours.")
+		printTip("Keep yt-dlp updated: " + cDim("pip install -U yt-dlp"))
 		os.Exit(1)
 	}
 
-	fmt.Printf("\n✅ Done! File saved in: %s\n", absOutputDir)
+	filePath = resolveDownloadedFile(videoDir)
+	printSuccess("Done! Saved to: %s", cPath(videoDir))
+	return filePath, outputDir
 }
