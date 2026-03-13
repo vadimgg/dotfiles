@@ -105,6 +105,15 @@ func AnalyzeScenes(videoPath, videoDir string) (scenesDir string, count int, err
 		count += extracted
 	}
 
+	// ── Compress the extracted JPEGs ──────────────────────────────────────────
+	fmt.Printf("\n%s\n", cBold("🗜️  Compressing scene images…"))
+	saved, compressed, _ := compressImages(scenesDir, 8)
+	if compressed > 0 {
+		printSuccess("Compressed %d images — saved %s", compressed, formatBytes(saved))
+	} else {
+		fmt.Printf("  %s\n", cDim("Images already optimal."))
+	}
+
 	fmt.Println()
 	printSuccess("Scene analysis complete — %d images in: %s", count, cPath(scenesDir))
 	return scenesDir, count, nil
