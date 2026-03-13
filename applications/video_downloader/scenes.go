@@ -154,61 +154,62 @@ func collectScoredFrames(videoPath string) ([]scoredFrame, error) {
 	return frames, nil
 }
 
-// extractAllFrames extracts every timestamp in a SINGLE ffmpeg pass using the
-// select filter. Output files are named by timestamp label.
-//
-// PySceneDetect does the same thing internally — one decode pass, all frames
-// written out together — which is why it's much faster than calling ffmpeg
-// once per frame.
+// extractAllFrames extracts one JPEG per timestamp using parallel ffmpeg seeks.
+// Each seek is a separate fast ffmpeg call (-ss before -i = keyframe seek),
+// but they all run concurrently so the total time is roughly the cost of one.
 func extractAllFrames(videoPath string, timestamps []float64, scenesDir string) (int, error) {
-	if len(timestamps) == 0 {
-		return 0, nil
+	type result struct {
+		idx   int
+		label string
+		err   error
 	}
 
-	// Build a select expression that matches each exact timestamp:
-	//   eq(t,12.340)+eq(t,25.680)+...
-	// ffmpeg will output exactly one frame per matching timestamp.
-	var parts []string
-	for _, ts := range timestamps {
-		parts = append(parts, fmt.Sprintf("eq(t\\,%.6f)", ts))
-	}
-	selectExpr := strings.Join(parts, "+")
+	results := make(chan result, len(timestamps))
 
-	// Output pattern: scenesDir/TIMESTAMP.jpg
-	// We use the pts_time to derive filenames via a combination of
-	// select + vsync + output pattern with frame number, then rename.
-	// Simpler: write to a temp pattern and rename after.
-	tmpPattern := filepath.Join(scenesDir, "frame_%06d.jpg")
-
-	args := []string{
-		"-hide_banner",
-		"-i", videoPath,
-		"-vf", fmt.Sprintf("select='%s',setpts=N/TB", selectExpr),
-		"-vsync", "0",
-		"-q:v", "2",
-		"-y",
-		tmpPattern,
-	}
-
-	cmd := exec.Command("ffmpeg", args...)
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		lines := strings.Split(strings.TrimSpace(string(out)), "\n")
-		return 0, fmt.Errorf("ffmpeg extract: %s", lines[len(lines)-1])
-	}
-
-	// Rename frame_000001.jpg → 00h03m42s500ms.jpg
-	count := 0
 	for i, ts := range timestamps {
-		src  := filepath.Join(scenesDir, fmt.Sprintf("frame_%06d.jpg", i+1))
-		dst  := filepath.Join(scenesDir, timestampLabel(ts)+".jpg")
-		if err := os.Rename(src, dst); err != nil {
-			// file may not have been written if select missed it
+		i, ts := i, ts // capture for goroutine
+		go func() {
+			label   := timestampLabel(ts)
+			outFile := filepath.Join(scenesDir, label+".jpg")
+			args := []string{
+				"-ss", fmt.Sprintf("%.6f", ts),
+				"-i", videoPath,
+				"-vframes", "1",
+				"-q:v", "2",
+				"-y",
+				outFile,
+			}
+			out, err := exec.Command("ffmpeg", args...).CombinedOutput()
+			if err != nil {
+				lines := strings.Split(strings.TrimSpace(string(out)), "\n")
+				results <- result{i, label, fmt.Errorf("%s", lines[len(lines)-1])}
+				return
+			}
+			results <- result{i, label, nil}
+		}()
+	}
+
+	// Collect results in order
+	type item struct{ label string; err error }
+	ordered := make([]item, len(timestamps))
+	for range timestamps {
+		r := <-results
+		ordered[r.idx] = item{r.label, r.err}
+	}
+
+	count := 0
+	for i, it := range ordered {
+		if it.err != nil {
+			fmt.Printf("  %s %s — %s\n",
+				cDim(fmt.Sprintf("[%3d/%d]", i+1, len(timestamps))),
+				cDim(it.label),
+				cError(it.err.Error()),
+			)
 			continue
 		}
 		fmt.Printf("  %s %s\n",
 			cDim(fmt.Sprintf("[%3d/%d]", i+1, len(timestamps))),
-			cPath(timestampLabel(ts)+".jpg"),
+			cPath(it.label+".jpg"),
 		)
 		count++
 	}

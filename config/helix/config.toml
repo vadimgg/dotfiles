@@ -2,6 +2,10 @@
 # theme = "catppuccin_mocha"
 theme = "cp_custom"
 
+[editor.soft-wrap]
+enable = true
+# wrap-at-text-width = true
+
 [editor]
 cursorline = true
 auto-save = true
@@ -68,7 +72,7 @@ X = ":buffer-close-others"
 C-q = ":quit-all"
 C-s = ":write!"
 x = ":buffer-close"
-e = [
+space = [
   ':sh rm -f /tmp/files2open',
   ':set mouse false',
   ':insert-output yazi "%{buffer_name}" --chooser-file=/tmp/files2open',

@@ -1,1 +1,4 @@
 .DS_Store
+config/helix/node_modules
+config/helix/package-lock.json
+config/helix/package.json

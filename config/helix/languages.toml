@@ -31,7 +31,7 @@ config = {typescript = {tsdk = "./node_modules/typescript/lib"}, environment = "
 
 [[language]]
 name = "html"
-# formatter = { command = 'npx', args = ["prettier", "--parser", "html"] }
+formatter = { command = 'npx', args = ["prettier", "--parser", "html"] }
 language-servers = ["vscode-html-language-server", "emmet-ls", "tailwindcss-ls"]
 
 [[language]]
@@ -79,4 +79,4 @@ soft-wrap.wrap-at-text-width = true
 name = "astro"
 formatter = { command = 'npx', args = ["prettier", "--plugin", "prettier-plugin-astro", "--parser", "astro"] }
 auto-format = true
-language-servers = [ "astro-ls", "emmet-ls" ]
+language-servers = [ "astro-ls", "emmet-ls", "javascript" ]
