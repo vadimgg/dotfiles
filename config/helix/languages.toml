@@ -80,3 +80,11 @@ name = "astro"
 formatter = { command = 'npx', args = ["prettier", "--plugin", "prettier-plugin-astro", "--parser", "astro"] }
 auto-format = true
 language-servers = [ "astro-ls", "emmet-ls", "javascript" ]
+
+[language-server.pyrefly]
+command = "pyrefly"
+args = [ "lsp" ]
+
+[[language]]
+name = "python"
+language-servers = [ "pyrefly" ]
