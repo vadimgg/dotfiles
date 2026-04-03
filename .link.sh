@@ -19,7 +19,7 @@ mkdir -p "$CONFIG_TARGET"
 echo -e "${YELLOW}Linking dotfiles into \$HOME...${NC}"
 
 # Link dotfiles from ~/dotfiles/home to ~/
-for SOURCE in "$HOME_SOURCE"/.*; do
+for SOURCE in "$CONFIG_SOURCE"/* "$CONFIG_SOURCE"/.*; do
   BASENAME=$(basename "$SOURCE")
   [[ "$BASENAME" == "." || "$BASENAME" == ".." ]] && continue
 

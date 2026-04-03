@@ -1,0 +1,55 @@
+# Update-2024.11.08.16.05
+
+# Loads all defined icons
+source "$CONFIG_DIR/icons.sh"
+# Loads all defined colors
+source "$CONFIG_DIR/colors.sh"
+PLUGIN_DIR="$CONFIG_DIR/plugins"
+ITEM_DIR="$CONFIG_DIR/items"
+# Define Font
+FONT="Hack Nerd Font"
+
+bar=(
+    padding_left=0
+    padding_right=0
+    position=top
+    height=30
+    blur_radius=30
+    corner_radius=8
+    margin=12
+    y_offset=2
+    shadow=true
+    color=$BASE
+)
+sketchybar --bar "${bar[@]}"
+
+default=(
+    padding_left=4
+    padding_right=4
+    icon.font="$FONT:Bold:16.0"
+    label.font="$FONT:Bold:16.0"
+    icon.color=$WHITE
+    label.color=$WHITE
+    icon.padding_left=4
+    icon.padding_right=4
+    label.padding_left=4
+    label.padding_right=4
+)
+sketchybar --default "${default[@]}"
+
+# -- Left Side Items --
+source "$ITEM_DIR/apple.sh"
+source "$ITEM_DIR/spaces.sh"
+source "$ITEM_DIR/front_app.sh"
+
+# -- Right Side Items -- 
+source "$ITEM_DIR/clock.sh"
+source "$ITEM_DIR/calendar.sh"
+source "$ITEM_DIR/battery.sh"
+source "$ITEM_DIR/network.sh"
+source "$ITEM_DIR/sound.sh"
+source "$ITEM_DIR/sysinfo.sh"
+source "$ITEM_DIR/weather.sh"
+
+sketchybar --update
+echo "sketchybar configuration loaded.."

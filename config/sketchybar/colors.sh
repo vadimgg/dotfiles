@@ -1,0 +1,30 @@
+#!/bin/bash
+
+TRANSPARENT=0x00000000
+WHITE=0xFFFFFFFF
+
+# Catppuccin Mocha
+BASE=0x661E1E2E        # base (with transparency like your current setup)
+SURFACE=0xFF1E1E2E     # base
+OVERLAY=0xFF313244     # surface0
+MUTED=0xFF585B70       # surface2
+SUBTLE=0xFF6C7086      # overlay1
+TEXT=0xFFCDD6F4        # text
+LOVE=0xFFF38BA8        # red
+GOLD=0xFFF9E2AF        # yellow
+ROSE=0xFFEBA0AC        # flamingo
+PINE=0xFF89B4FA        # blue
+FOAM=0xFF94E2D5        # teal
+IRIS=0xFFCBA6F7        # mauve
+LOW=0xFF181825         # mantle
+MED=0xFF313244         # surface0
+HIGH=0xFF45475A        # surface1
+
+BATTERY_COLOR=$GOLD
+CALENDAR_COLOR=$IRIS
+CLOCK_COLOR=$PINE
+APPLE_COLOR=0xFF00E5E8
+NETWORK_COLOR=0xFFA3F7B5
+SOUND_COLOR=0xFFFDCA40
+WEATHER_COLOR=0xFFFDE8E9
+SPACES_COLOR=0xFFECDCC9

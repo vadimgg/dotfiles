@@ -104,6 +104,8 @@ for cask in "${CASKS[@]}"; do
   install_cask_if_missing "$cask"
 done
 
+brew install --cask font-sf-pro
+
 # 5. Cleanup
 echo_header "Cleaning up..."
 brew cleanup
