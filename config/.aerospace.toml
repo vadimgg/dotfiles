@@ -27,8 +27,11 @@ automatically-unhide-macos-hidden-apps = false
 # Persistent workspaces
 persistent-workspaces = ["1", "2", "3", "4", "5", "6"]
 
+# exec-on-workspace-change = ['/bin/bash', '-c',
+#     'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE'
+# ]
 exec-on-workspace-change = ['/bin/bash', '-c',
-    'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE'
+    'sketchybar --trigger aerospace_workspace_change AEROSPACE_FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE'
 ]
 
 on-mode-changed = []
@@ -89,21 +92,34 @@ on-mode-changed = []
 
     # Modes
     alt-a = ['exec-and-forget open -n -b com.mitchellh.ghostty', 'workspace 1', 'mode main']
-    alt-shift-semicolon = 'mode service'
+    # alt-shift-semicolon = 'mode service'
+    alt-shift-semicolon = ['mode service', 'exec-and-forget sketchybar --trigger aerospace_mode_changed MODE=service']
+
 
     # Close window
     alt-shift-backspace = 'close'
 
 [mode.service.binding]
-    esc = ['reload-config', 'mode main']
-    r = ['flatten-workspace-tree', 'mode main']
-    f = ['layout floating tiling', 'mode main']
-    backspace = ['close-all-windows-but-current', 'mode main']
+    esc = ['reload-config', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_changed MODE=main']
+    r = ['flatten-workspace-tree', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_changed MODE=main']
+    f = ['layout floating tiling', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_changed MODE=main']
+    backspace = ['close-all-windows-but-current', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_changed MODE=main']
 
-    alt-shift-h = ['join-with left', 'mode main']
-    alt-shift-j = ['join-with down', 'mode main']
-    alt-shift-k = ['join-with up', 'mode main']
-    alt-shift-l = ['join-with right', 'mode main']
+    alt-shift-h = ['join-with left', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_changed MODE=main']
+    alt-shift-j = ['join-with down', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_changed MODE=main']
+    alt-shift-k = ['join-with up', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_changed MODE=main']
+    alt-shift-l = ['join-with right', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_changed MODE=main']
+
+    # esc = ['reload-config', 'mode main']
+
+    # r = ['flatten-workspace-tree', 'mode main']
+    # f = ['layout floating tiling', 'mode main']
+    # backspace = ['close-all-windows-but-current', 'mode main']
+
+    # alt-shift-h = ['join-with left', 'mode main']
+    # alt-shift-j = ['join-with down', 'mode main']
+    # alt-shift-k = ['join-with up', 'mode main']
+    # alt-shift-l = ['join-with right', 'mode main']
 
 [[on-window-detected]]
     if.app-id = 'com.mitchellh.ghostty'

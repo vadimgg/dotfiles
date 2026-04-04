@@ -41,6 +41,7 @@ sketchybar --default "${default[@]}"
 source "$ITEM_DIR/apple.sh"
 source "$ITEM_DIR/spaces.sh"
 # source "$ITEM_DIR/front_app.sh"
+source "$ITEM_DIR/mode.sh"   # add this
 
 # -- Right Side Items -- 
 source "$ITEM_DIR/clock.sh"
@@ -53,3 +54,6 @@ source "$ITEM_DIR/weather.sh"
 
 sketchybar --update
 echo "sketchybar configuration loaded.."
+
+MODE=main sketchybar --set aerospace_mode drawing=off background.drawing=off label=""
+
