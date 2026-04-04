@@ -28,6 +28,9 @@ ACTIVE_SPACE=(
     popup.background.border_color=$OVERLAY
 )
 
+# sketchybar --add item active_space left \
+#            --set active_space "${ACTIVE_SPACE[@]}" \
+#            --subscribe active_space aerospace_workspace_change front_app_switched
 sketchybar --add item active_space left \
            --set active_space "${ACTIVE_SPACE[@]}" \
-           --subscribe active_space aerospace_workspace_change front_app_switched
+           --subscribe active_space aerospace_workspace_change front_app_switched mouse.exited.global
