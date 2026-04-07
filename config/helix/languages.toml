@@ -81,10 +81,19 @@ formatter = { command = 'npx', args = ["prettier", "--plugin", "prettier-plugin-
 auto-format = true
 language-servers = [ "astro-ls", "emmet-ls", "javascript" ]
 
+[language-server.ruff]
+command = "ruff"
+args = ["server"]
+
 [language-server.pyrefly]
 command = "pyrefly"
-args = [ "lsp" ]
+args = ["lsp"]
 
 [[language]]
 name = "python"
-language-servers = [ "pyrefly" ]
+language-servers = ["pyrefly", "ruff"]   # both active simultaneously
+auto-format = true                    # format on save
+
+formatter = { command = "ruff", args = ["format", "--quiet", "-"] }
+# OR if you prefer black:
+# formatter = { command = "black", args = ["--quiet", "-"] }

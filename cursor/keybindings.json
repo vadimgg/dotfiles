@@ -1,0 +1,21 @@
+[
+    // Navigation
+    { "key": "shift+h", "command": "cursorHome", "when": "editorTextFocus && !inSnippetMode" },
+    { "key": "shift+l", "command": "cursorEnd", "when": "editorTextFocus && !inSnippetMode" },
+    { "key": "shift+h", "command": "cursorHomeSelect", "when": "editorTextFocus && !inSnippetMode && editorHasSelection" },
+    { "key": "shift+l", "command": "cursorEndSelect", "when": "editorTextFocus && !inSnippetMode && editorHasSelection" },
+  
+    // Buffers
+    { "key": "tab", "command": "workbench.action.nextEditor", "when": "editorTextFocus" },
+    { "key": "shift+tab", "command": "workbench.action.previousEditor", "when": "editorTextFocus" },
+    { "key": "shift+v", "command": "editor.action.insertCursorBelow", "when": "editorTextFocus" },
+      
+    // Editing
+    { "key": "shift+d", "command": "deleteAllRight", "when": "editorTextFocus" },
+    { "key": "shift+k", "command": "cursorUpSelect", "when": "editorTextFocus" },
+    { "key": "shift+j", "command": "cursorDownSelect", "when": "editorTextFocus" } ,
+    { "key": "shift+alt+up", "command": "editor.action.smartSelect.expand", "when": "editorTextFocus" },
+    { "key": "shift+alt+down", "command": "editor.action.smartSelect.shrink", "when": "editorTextFocus" },
+    
+
+  ]

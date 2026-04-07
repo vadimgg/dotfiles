@@ -65,6 +65,7 @@ tab = "all"
 newline = "none"
 
 # https://quantonganh.com/2023/08/19/turn-helix-into-ide 
+# 
 [keys.normal.space]
 F = "file_picker_in_current_buffer_directory"
 R = ["change_selection", "paste_clipboard_before", "normal_mode"]
@@ -72,6 +73,9 @@ X = ":buffer-close-others"
 C-q = ":quit-all"
 C-s = ":write!"
 x = ":buffer-close"
+
+
+
 space = [
   ':sh rm -f /tmp/files2open',
   ':set mouse false',

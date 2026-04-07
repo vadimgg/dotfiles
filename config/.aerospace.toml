@@ -65,8 +65,8 @@ on-mode-changed = []
     alt-shift-l = 'move right'
 
     # Navigate workspaces
-    alt-right = 'workspace next'
-    alt-left = 'workspace prev'
+    # alt-right = 'workspace next'
+    # alt-left = 'workspace prev'
     alt-tab = 'workspace-back-and-forth'
     alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'
 
@@ -91,25 +91,27 @@ on-mode-changed = []
     alt-shift-6 = 'move-node-to-workspace 6'
 
     # Modes
-    alt-a = ['exec-and-forget open -n -b com.mitchellh.ghostty', 'workspace 1', 'mode main']
+    alt-a = ['exec-and-forget open -n -b com.mitchellh.ghostty']
+    alt-v = ['exec-and-forget open -n -b com.asiafu.Bloom']
+    alt-t = 'layout floating tiling'
     # alt-shift-semicolon = 'mode service'
     alt-shift-semicolon = ['mode service', 'exec-and-forget sketchybar --trigger aerospace_mode_changed MODE=service']
 
-    alt-f = 'fullscreen'
+    alt-shift-f = 'fullscreen'
 
     # Close window
     alt-shift-backspace = 'close'
 
 [mode.service.binding]
     esc = ['reload-config', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_changed MODE=main']
-    r = ['flatten-workspace-tree', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_changed MODE=main']
-    f = ['layout floating tiling', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_changed MODE=main']
-    backspace = ['close-all-windows-but-current', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_changed MODE=main']
+    alt-r = ['flatten-workspace-tree', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_changed MODE=main']
+    alt-t = ['layout floating tiling', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_changed MODE=main']
+    alt-shift-backspace = ['close-all-windows-but-current', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_changed MODE=main']
 
-    alt-shift-h = ['join-with left', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_changed MODE=main']
-    alt-shift-j = ['join-with down', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_changed MODE=main']
-    alt-shift-k = ['join-with up', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_changed MODE=main']
-    alt-shift-l = ['join-with right', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_changed MODE=main']
+    alt-h = ['join-with left', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_changed MODE=main']
+    alt-j = ['join-with down', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_changed MODE=main']
+    alt-k = ['join-with up', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_changed MODE=main']
+    alt-l = ['join-with right', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_changed MODE=main']
 
     # esc = ['reload-config', 'mode main']
 
@@ -122,13 +124,13 @@ on-mode-changed = []
     # alt-shift-k = ['join-with up', 'mode main']
     # alt-shift-l = ['join-with right', 'mode main']
 
-[[on-window-detected]]
-    if.app-id = 'com.mitchellh.ghostty'
-    run = ['move-node-to-workspace 1', 'layout accordion']
+# [[on-window-detected]]
+#     if.app-id = 'com.mitchellh.ghostty'
+#     run = ['move-node-to-workspace 1', 'layout accordion']
 
-[[on-window-detected]]
-    if.app-id = 'com.adobe.Photoshop'
-    run = 'move-node-to-workspace 2'
+# [[on-window-detected]]
+#     if.app-id = 'com.adobe.Photoshop'
+#     run = 'move-node-to-workspace 2'
 
 [[on-window-detected]]
     if.app-id = 'com.blackmagic-design.DaVinciResolve'
